@@ -9,7 +9,7 @@ A Python library providing pricing for Counter-Strike 2, Dota 2, Rust, and Team 
 ---
 
 ```bash
-pip install git+https://github.com/L0G1H/steam_prices.git
+pip install git+ssh://git@github.com/L0G1H/steam_prices.git
 ```
 
 ### Dependencies
@@ -30,6 +30,7 @@ This library requires the following dependencies, which will be installed automa
 - `game` (str, optional): The game from which to fetch item prices. Allowed values: `cs2` (Counter-Strike 2), `dota2`, `rust`, `tf2`. (default is `cs2`).
 - `currency` (str, optional): The currency for the prices. Default is `EUR`. (e.g., `USD`, `GBP`).
 - `return_type` (str, optional): The format of the returned data. Allowed values: `dataframe`, `dict`. Default is `dataframe`.
+- `clean_return` (bool, optional): Returns all unfiltered steamwebapi columns if set to `False`. Default is `True`.
 
 ### Example
 

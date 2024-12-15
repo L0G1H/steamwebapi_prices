@@ -139,3 +139,8 @@ def get_prices(api_key: str, *,
         return df
     elif return_type == "dict":
         return df.set_index("name").to_dict(orient="index")
+
+
+if __name__ == "__main__":
+    import os
+    print(get_prices(os.getenv("steam_web_api")))

@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="steam_prices",
-    version="0.3",
+    name="steamwebapi_prices",
+    version="0.4",
     packages=find_packages(),
     install_requires=[
         "requests",

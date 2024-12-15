@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 from unittest.mock import patch, Mock
-from steam_prices.steam_prices import get_prices
+from steamwebapi_prices.steamwebapi_prices import get_prices
 
 
 class TestGetPrices(unittest.TestCase):

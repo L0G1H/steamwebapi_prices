@@ -1,17 +1,17 @@
-# steam_prices
+# Steamwebapi Prices
 
 Python module for getting Steam Market and third-party website prices for items from CS2, Dota 2, Rust, and Team Fortress 2.
 
 ## Installation
 
 ```bash
-pip install git+https://github.com/L0G1H/steam_prices.git
+pip install git+https://github.com/L0G1H/steamwebapi_prices.git
 ```
 
 ## Usage
 
 ```python
-from steam_prices import get_prices
+from steamwebapi_prices import get_prices
 
 # Get CS2 prices in EUR
 prices = get_prices("YOUR_API_KEY")

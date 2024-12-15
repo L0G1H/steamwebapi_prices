@@ -28,17 +28,6 @@ def get_prices(api_key: str, *,
     if return_type not in {"dataframe", "dict"}:
         raise ValueError("Invalid 'return_type'. Use 'dataframe' or 'dict'.")
 
-    all_items_ids_url = ("https://raw.githubusercontent.com/ModestSerhat/"
-                         "cs2-marketplace-ids/refs/heads/main/cs2_marketplaceids.json")
-
-    try:
-        response = requests.get(all_items_ids_url)
-        response.raise_for_status()
-        all_items_ids_data = response.json()
-    except Exception as e:
-        raise SystemExit(f"{all_items_ids_url} request failed: {e}")
-
-    all_items_names = {item for item in all_items_ids_data.get("items") if isinstance(item, str)}
     try:
         response = requests.get(
             "https://www.steamwebapi.com/steam/api/items",
@@ -56,19 +45,32 @@ def get_prices(api_key: str, *,
     df = df[~df.index.duplicated(keep="first")]
     df[df.isna()] = 0
 
-    df = df[df.index.isin(all_items_names)]
+    if game == "cs2":
+        all_items_ids_url = ("https://raw.githubusercontent.com/ModestSerhat/"
+                             "cs2-marketplace-ids/refs/heads/main/cs2_marketplaceids.json")
 
-    missing_items = all_items_names - set(df.index)
+        try:
+            response = requests.get(all_items_ids_url)
+            response.raise_for_status()
+            all_items_ids_data = response.json()
+        except Exception as e:
+            raise SystemExit(f"{all_items_ids_url} request failed: {e}")
 
-    missing_df = pd.DataFrame(index=list(missing_items), columns=df.columns)
-    missing_df["name"] = list(missing_items)
-    missing_df = missing_df.dropna(axis=1, how="all")
+        all_items_names = {item for item in all_items_ids_data.get("items") if isinstance(item, str)}
+        df = df[df.index.isin(all_items_names)]
 
-    for col in df.columns:
-        if col not in missing_df.columns:
-            missing_df[col] = np.nan
+        missing_items = all_items_names - set(df.index)
 
-    df = pd.concat([df, missing_df], axis=0)
+        missing_df = pd.DataFrame(index=list(missing_items), columns=df.columns)
+        missing_df["name"] = list(missing_items)
+        missing_df = missing_df.dropna(axis=1, how="all")
+
+        for col in df.columns:
+            if col not in missing_df.columns:
+                missing_df[col] = np.nan
+
+        df = pd.concat([df, missing_df], axis=0)
+
     df = (df.infer_objects(copy=False)
           .reset_index()
           .loc[~df.index.duplicated()]
@@ -182,7 +184,7 @@ def get_prices(api_key: str, *,
 
 if __name__ == "__main__":
     import os
-    data = get_prices(os.getenv("steam_web_api"))
+    data = get_prices(os.getenv("steam_web_api"), game="cs2")
 
     print(data)
     data.to_csv("test.csv", index=False)

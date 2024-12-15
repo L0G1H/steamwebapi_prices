@@ -1,6 +1,6 @@
 # Steamwebapi Prices
 
-Python module for getting Steam Market and third-party website prices for items from CS2, Dota 2, Rust, and Team Fortress 2.
+Unofficial python module for getting Steam Market and third-party website prices for items from CS2, Dota 2, Rust, and Team Fortress 2
 
 ## Installation
 

@@ -17,13 +17,13 @@ from steamwebapi_prices import get_prices
 prices = get_prices("YOUR_API_KEY")
 
 # Get Dota 2 prices in USD
-prices = get_prices("YOUR_API_KEY", game="dota2", currency="USD")
+prices2 = get_prices("YOUR_API_KEY", game="dota2", currency="USD")
 
 # Get as dictionary instead of DataFrame
-prices = get_prices("YOUR_API_KEY", return_type="dict")
+prices3 = get_prices("YOUR_API_KEY", return_type="dict")
 
 # Get all available data
-prices = get_prices("YOUR_API_KEY", return_everything=True)
+prices4 = get_prices("YOUR_API_KEY", return_everything=True)
 ```
 
 ## Parameters

@@ -1,3 +1,4 @@
+from __future__ import annotations
 import requests
 import pandas as pd
 import numpy as np
@@ -35,8 +36,8 @@ def get_prices(api_key: str, *,
         )
         response.raise_for_status()
         steamweb_api_data = response.json()
-    except Exception as e:
-        raise SystemExit(f"SteamWebApi request failed: {e}")
+    except Exception as _:
+        raise SystemExit("SteamWebApi request failed") from None
 
     df = pd.DataFrame(steamweb_api_data)
     df["name"] = df["markethashname"]
@@ -53,10 +54,12 @@ def get_prices(api_key: str, *,
             response = requests.get(all_items_ids_url)
             response.raise_for_status()
             all_items_ids_data = response.json()
-        except Exception as e:
-            raise SystemExit(f"{all_items_ids_url} request failed: {e}")
+        except Exception as _:
+            raise SystemExit("Request failed") from None
 
-        all_items_names = {item for item in all_items_ids_data.get("items") if isinstance(item, str)}
+        all_items_names = {item for item in all_items_ids_data.get("items")
+                           if isinstance(item, str)}
+
         df = df[df.index.isin(all_items_names)]
 
         missing_items = all_items_names - set(df.index)
@@ -77,14 +80,15 @@ def get_prices(api_key: str, *,
           .replace(0, np.nan))
 
     df["steam_price_min"] = df[["buyorderprice", "pricemin"]].max(axis=1, skipna=True)
-    df["steam_price_max"] = df[["pricemedian", "priceavg", "pricemax"]].min(axis=1, skipna=True)
+    df["steam_price_max"] = df[["pricemedian", "priceavg", "pricemax"]].min(
+            axis=1, skipna=True)
 
     df["steam_price"] = np.where(
         (~df["steam_price_min"].isna()) & (~df["steam_price_max"].isna()),
         np.round((df["steam_price_min"] + df["steam_price_max"]) / 2, 2),
         np.nan
     )
-    
+
     steam_price_min_ratio = np.mean(df["steam_price"] / df["steam_price_min"])
     steam_price_max_ratio = np.mean(df["steam_price"] / df["steam_price_max"])
 
@@ -130,12 +134,14 @@ def get_prices(api_key: str, *,
 
     filtered_df = df[~df["steam_price"].isna() & ~df["real_price"].isna()].copy()
 
-    steam_price_to_real_price_ratio = (filtered_df["steam_price"] / filtered_df["real_price"]).mean()
+    steam_price_to_real_price_ratio = \
+        (filtered_df["steam_price"] / filtered_df["real_price"]).mean()
     real_price_to_steam_price_ratio = 1 / steam_price_to_real_price_ratio
 
     df["estimated_steam_price"] = np.where(
         ~df["real_price"].isna(),
-        np.maximum(MINIMUM_STEAM_PRICE, np.round(df["real_price"] * steam_price_to_real_price_ratio, 2)),
+        np.maximum(MINIMUM_STEAM_PRICE,
+                   np.round(df["real_price"] * steam_price_to_real_price_ratio, 2)),
         np.nan
     )
 
@@ -147,7 +153,8 @@ def get_prices(api_key: str, *,
 
     df["estimated_real_price"] = np.where(
         ~df["steam_price"].isna(),
-        np.maximum(MINIMUM_REAL_PRICE, np.round(df["steam_price"] * real_price_to_steam_price_ratio, 2)),
+        np.maximum(MINIMUM_REAL_PRICE,
+                   np.round(df["steam_price"] * real_price_to_steam_price_ratio, 2)),
         np.nan
     )
 
@@ -160,13 +167,14 @@ def get_prices(api_key: str, *,
         )
 
     rename_map = {
-        "sold24h": "steam_sold_24h", "sold7d": "steam_sold_7d", "sold30d": "steam_sold_30d",
-        "markethashname": "name", "pricerealchangepercent24h": "real_price_change_percent_24h",
+        "sold24h": "steam_sold_24h", "sold7d": "steam_sold_7d",
+        "sold30d": "steam_sold_30d", "markethashname": "name",
+        "pricerealchangepercent24h": "real_price_change_percent_24h",
         "pricerealchangepercent7d": "real_price_change_percent_7d",
         "pricerealchangepercent30d": "real_price_change_percent_30d",
     }
 
-    df.rename(columns=rename_map, inplace=True)
+    df = df.rename(columns=rename_map)
 
     if not return_everything:
         df = df[[
@@ -178,13 +186,15 @@ def get_prices(api_key: str, *,
 
     if return_type == "dataframe":
         return df
-    elif return_type == "dict":
+
+    if return_type == "dict":
         return df.set_index("name").to_dict(orient="index")
 
+    return None
 
 if __name__ == "__main__":
     import os
-    data = get_prices(os.getenv("steam_web_api"), game="cs2")
+    data = get_prices(os.getenv("STEAMWEBAPI_API_KEY"), game="cs2")
 
     print(data)
-    data.to_csv("test.csv", index=False)
+

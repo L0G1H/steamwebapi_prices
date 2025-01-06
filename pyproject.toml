@@ -1,0 +1,11 @@
+[project]
+name = "steamwebapi-prices"
+version = "2.2.0"
+description = "Unofficial SteamWebAPI wrapper to get Steam Market and third-party website prices"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=2.2.1",
+    "pandas>=2.2.3",
+    "requests>=2.32.3",
+]
